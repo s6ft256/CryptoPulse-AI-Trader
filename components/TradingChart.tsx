@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResponsiveContainer, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Bar, Cell, Line, ReferenceLine, Label } from 'recharts';
+import { ResponsiveContainer, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Bar, Cell, Line, ReferenceLine, Label, ReferenceArea } from 'recharts';
 import type { Candle, AIPrediction } from '../types';
 
 interface TradingChartProps {
@@ -41,7 +41,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({ data, prediction }) 
   return (
     <div className="h-full w-full">
       <ResponsiveContainer>
-        <ComposedChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+        <ComposedChart data={data} margin={{ top: 5, right: 60, bottom: 5, left: -20 }}>
           <CartesianGrid stroke={ '#2a2e39'} strokeDasharray="3 3" />
           <XAxis dataKey="date" stroke={'#8b92a1'} fontSize={10} tickLine={false} axisLine={false} />
           <YAxis
@@ -71,14 +71,15 @@ export const TradingChart: React.FC<TradingChartProps> = ({ data, prediction }) 
           {/* AI Prediction Lines */}
           {prediction && (
               <>
-                  <ReferenceLine y={prediction.priceTarget} stroke="#2962ff" strokeDasharray="4 4">
-                      <Label value={`Target: ${prediction.priceTarget.toFixed(2)}`} fill="#2962ff" position="insideRight" fontSize={10} style={{ backgroundColor: '#131722' }} />
+                  <ReferenceArea y1={prediction.potentialLow} y2={prediction.potentialHigh} stroke="none" fill="#2962ff" fillOpacity={0.1} ifOverflow="visible" />
+                  <ReferenceLine y={prediction.priceTarget} stroke="#2962ff" strokeWidth={2}>
+                      <Label value={`Target: ${prediction.priceTarget.toFixed(2)}`} fill="#2962ff" position="right" fontSize={12} fontWeight="bold" />
                   </ReferenceLine>
-                  <ReferenceLine y={prediction.potentialHigh} stroke="#26a69a" strokeDasharray="4 4">
-                      <Label value={`High: ${prediction.potentialHigh.toFixed(2)}`} fill="#26a69a" position="insideRight" fontSize={10} style={{ backgroundColor: '#131722' }} />
+                  <ReferenceLine y={prediction.potentialHigh} stroke="#26a69a" strokeDasharray="3 3">
+                      <Label value={`High: ${prediction.potentialHigh.toFixed(2)}`} fill="#26a69a" position="right" fontSize={10} />
                   </ReferenceLine>
-                  <ReferenceLine y={prediction.potentialLow} stroke="#ef5350" strokeDasharray="4 4">
-                      <Label value={`Low: ${prediction.potentialLow.toFixed(2)}`} fill="#ef5350" position="insideRight" fontSize={10} style={{ backgroundColor: '#131722' }} />
+                  <ReferenceLine y={prediction.potentialLow} stroke="#ef5350" strokeDasharray="3 3">
+                      <Label value={`Low: ${prediction.potentialLow.toFixed(2)}`} fill="#ef5350" position="right" fontSize={10} />
                   </ReferenceLine>
               </>
           )}
