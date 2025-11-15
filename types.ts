@@ -52,6 +52,11 @@ export interface AIPrediction {
   summary: string;
   keyDrivers: string;
   strategy: string;
+  technicalIndicators: {
+    rsi14: number;
+    macdStatus: string;
+    movingAverageSignal: string;
+  };
   quantitativeSentiment: {
     newsScore: number;
     retailPositioning: string;
@@ -115,4 +120,22 @@ export interface PredictionAnalysis {
   expectedOutcome: string;
   reinforcementStrategy: string;
   confidenceEvaluation: string;
+}
+
+export interface TopCoinPick {
+  symbol: string;
+  reasoning: string;
+  confidence: number;
+  potentialGain: string;
+}
+
+export interface ContenderCoin {
+  symbol: string;
+  summary: string;
+}
+
+export interface CoinScreenerPrediction {
+  topPick: TopCoinPick;
+  contenders: ContenderCoin[];
+  marketOverview: string;
 }

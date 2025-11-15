@@ -17,21 +17,130 @@ const AnalysisSection: React.FC<{title: string, children: React.ReactNode}> = ({
     </div>
 );
 
-const QuantitativeSentimentSection: React.FC<{ sentiment: AIPrediction['quantitativeSentiment'] }> = ({ sentiment }) => {
-    if (!sentiment) return null;
-    
-    const scoreColor = sentiment.newsScore > 20 ? 'text-accent-green' : sentiment.newsScore < -20 ? 'text-accent-red' : 'text-slate-300';
+const ConfidenceGauge: React.FC<{ confidence: number; trend: string }> = ({ confidence, trend }) => {
+    const radius = 40;
+    const circumference = Math.PI * radius; // This is for a half-circle
+    const offset = circumference - (confidence / 100) * circumference;
+
+    const trendColor =
+        trend === 'BULLISH' ? '#26a69a' :
+        trend === 'BEARISH' ? '#ef5350' :
+        '#8b92a1';
+
+    return (
+        <div className="relative flex justify-center items-center h-20">
+            <svg className="w-40 h-20 transform">
+                <path
+                    d="M 10 50 A 40 40 0 0 1 90 50"
+                    strokeWidth="10"
+                    stroke="#1e222d"
+                    fill="transparent"
+                    strokeLinecap="round"
+                />
+                <path
+                    d="M 10 50 A 40 40 0 0 1 90 50"
+                    strokeWidth="10"
+                    stroke={trendColor}
+                    fill="transparent"
+                    strokeLinecap="round"
+                    className="transition-all duration-700 ease-out"
+                    style={{ strokeDasharray: circumference, strokeDashoffset: offset }}
+                />
+            </svg>
+            <span className="absolute text-2xl font-bold font-mono" style={{ color: trendColor }}>
+                {confidence}%
+            </span>
+        </div>
+    );
+};
+
+const getRsiStatus = (rsi: number) => {
+    if (rsi > 70) return { text: 'Overbought', color: 'text-accent-red' };
+    if (rsi < 30) return { text: 'Oversold', color: 'text-accent-green' };
+    return { text: 'Neutral', color: 'text-dark-text-secondary' };
+};
+
+const RsiGauge: React.FC<{ rsi: number }> = ({ rsi }) => {
+    const status = getRsiStatus(rsi);
+    return (
+        <div>
+            <div className="flex justify-between items-baseline mb-1">
+                <span className="font-semibold text-white">RSI (14)</span>
+                <span className={`font-mono font-bold ${status.color}`}>{rsi.toFixed(1)}</span>
+            </div>
+            <div className="w-full bg-dark-surface rounded-full h-1.5 relative">
+                <div className="absolute w-full h-full bg-gradient-to-r from-accent-green via-slate-500 to-accent-red rounded-full opacity-50"></div>
+                <div 
+                    className="absolute top-1/2 -translate-y-1/2 h-2.5 w-1 bg-white rounded-full transition-all duration-500" 
+                    style={{ left: `calc(${rsi}% - 2px)` }}
+                ></div>
+            </div>
+            <p className={`text-right text-xs mt-1 font-semibold ${status.color}`}>{status.text}</p>
+        </div>
+    );
+};
+
+const IndicatorRow: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+    const isBullish = value.toLowerCase().includes('bullish') || value.toLowerCase().includes('above');
+    const isBearish = value.toLowerCase().includes('bearish') || value.toLowerCase().includes('below');
+    const color = isBullish ? 'text-accent-green' : isBearish ? 'text-accent-red' : 'text-dark-text-secondary';
+
+    return (
+        <div className="flex justify-between items-center py-2 border-b border-dark-border/50 last:border-b-0">
+            <span className="font-semibold text-dark-text-secondary">{label}</span>
+            <span className={`font-mono font-bold text-sm ${color}`}>{value}</span>
+        </div>
+    );
+};
+
+const TechnicalIndicatorsSection: React.FC<{ indicators: AIPrediction['technicalIndicators'] }> = ({ indicators }) => {
+    if (!indicators) return null;
     
     return (
-        <AnalysisSection title="Quantitative Sentiment">
-            <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                <div className="bg-dark-surface p-2 rounded">
-                    <p className="text-dark-text-secondary mb-1">News Score</p>
-                    <p className={`font-mono font-bold text-lg ${scoreColor}`}>{sentiment.newsScore}</p>
+        <AnalysisSection title="Technical Indicators">
+            <div className="space-y-4">
+                <RsiGauge rsi={indicators.rsi14} />
+                <div className="bg-dark-surface p-2 rounded-md">
+                    <IndicatorRow label="MACD" value={indicators.macdStatus} />
+                    <IndicatorRow label="Moving Avg." value={indicators.movingAverageSignal} />
                 </div>
-                 <div className="bg-dark-surface p-2 rounded">
-                    <p className="text-dark-text-secondary mb-1">Retail Position</p>
-                    <p className="font-mono font-bold text-lg text-white">{sentiment.retailPositioning}</p>
+            </div>
+        </AnalysisSection>
+    );
+};
+
+
+const QuantitativeSentimentSection: React.FC<{ sentiment: AIPrediction['quantitativeSentiment'] }> = ({ sentiment }) => {
+    if (!sentiment) return null;
+
+    const { newsScore, retailPositioning } = sentiment;
+    const scoreColor = newsScore > 15 ? 'text-accent-green' : newsScore < -15 ? 'text-accent-red' : 'text-slate-300';
+    // Map score from -50 to 50 range to -80 to 80 degree range for the needle
+    const rotation = Math.max(-80, Math.min(80, newsScore * (80 / 50)));
+
+    return (
+        <AnalysisSection title="Quantitative Sentiment">
+            <div className="grid grid-cols-2 gap-3">
+                <div className="bg-dark-surface p-3 rounded-md flex flex-col items-center justify-center text-center">
+                    <p className="text-xs text-dark-text-secondary mb-2">News Score</p>
+                    <div className="relative w-24 h-12">
+                        {/* Gauge background arc */}
+                        <svg viewBox="0 0 100 50" className="w-full h-full">
+                            <path d="M 10 45 A 40 40 0 0 1 90 45" stroke="#2a2e39" strokeWidth="8" fill="none" strokeLinecap="round" />
+                        </svg>
+                        {/* Needle */}
+                        <div
+                            className="absolute bottom-1 left-1/2 w-0.5 h-10 bg-white rounded-full transition-transform duration-500 origin-bottom"
+                            style={{ transform: `translateX(-50%) rotate(${rotation}deg)` }}
+                        />
+                         {/* Needle pivot */}
+                        <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-white rounded-full transform -translate-x-1/2"></div>
+                    </div>
+                    <p className={`font-mono font-bold text-xl mt-2 ${scoreColor}`}>{newsScore}</p>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-md flex flex-col items-center justify-center text-center">
+                    <p className="text-xs text-dark-text-secondary mb-1">Retail Position</p>
+                    <p className="font-mono font-bold text-lg text-white">{retailPositioning}</p>
                 </div>
             </div>
         </AnalysisSection>
@@ -74,45 +183,44 @@ export const AiAnalysis: React.FC<AiAnalysisProps> = ({ prediction, isLoading, e
             );
         }
 
-        const { prediction: trend, confidence, priceTarget, potentialHigh, potentialLow, summary, keyDrivers, strategy, quantitativeSentiment } = prediction;
+        const { prediction: trend, confidence, priceTarget, potentialHigh, potentialLow, summary, keyDrivers, strategy, technicalIndicators, quantitativeSentiment } = prediction;
         
         const trendColor = 
             trend === 'BULLISH' ? 'text-accent-green' :
             trend === 'BEARISH' ? 'text-accent-red' :
             'text-dark-text-secondary';
-        
-        const trendBg = 
-            trend === 'BULLISH' ? 'bg-accent-green' :
-            trend === 'BEARISH' ? 'bg-accent-red' :
-            'bg-dark-text-secondary';
-
+            
+        const priceRange = potentialHigh - potentialLow;
+        const targetPosition = priceRange > 0 ? ((priceTarget - potentialLow) / priceRange) * 100 : 50;
 
         return (
-            <div className="p-3 space-y-3 text-sm">
-                <div>
-                    <h4 className="font-bold text-white mb-2">Monthly Outlook</h4>
-                    <div className="bg-dark-bg p-3 rounded-md">
-                        <div className="flex justify-between items-center mb-2">
-                           <span className={`text-lg font-bold ${trendColor}`}>{trend}</span>
-                           <span className="text-sm text-dark-text-secondary">Confidence</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <div className="w-full bg-dark-surface rounded-full h-2">
-                               <div className={`h-2 rounded-full ${trendBg}`} style={{width: `${confidence}%`}}></div>
-                           </div>
-                           <span className={`font-mono font-bold ${trendColor}`}>{confidence}%</span>
-                        </div>
-                    </div>
+            <div className="p-3 space-y-4 text-sm">
+                <div className="bg-dark-bg p-3 rounded-md">
+                    <h4 className="font-bold text-white mb-1 text-center">Monthly Outlook</h4>
+                    <ConfidenceGauge confidence={confidence} trend={trend} />
+                    <p className={`text-2xl font-bold text-center -mt-2 ${trendColor}`}>{trend}</p>
                 </div>
 
-                <div>
-                     <h4 className="font-bold text-white mb-2">Price Projections</h4>
-                     <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
-                           <div className="bg-dark-bg p-2 rounded"><span className="text-dark-text-secondary block">Low</span> <span className="text-accent-red font-semibold text-sm">{potentialLow.toFixed(2)}</span></div>
-                           <div className="bg-dark-bg p-2 rounded border-2 border-accent-blue"><span className="text-dark-text-secondary block">Target</span> <span className="text-accent-blue font-bold text-base">{priceTarget.toFixed(2)}</span></div>
-                           <div className="bg-dark-bg p-2 rounded"><span className="text-dark-text-secondary block">High</span> <span className="text-accent-green font-semibold text-sm">{potentialHigh.toFixed(2)}</span></div>
+                <div className="bg-dark-bg p-3 rounded-md">
+                     <h4 className="font-bold text-white mb-4">Price Projections</h4>
+                     <div className="relative">
+                        <div className="h-1.5 bg-gradient-to-r from-accent-red via-slate-500 to-accent-green rounded-full"></div>
+                        <div 
+                            className="absolute -top-2.5 w-1 h-6 bg-accent-blue rounded-full transform -translate-x-1/2"
+                            style={{ left: `${targetPosition}%`}}
+                        >
+                            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-xs font-bold text-accent-blue">
+                                {priceTarget.toFixed(2)}
+                            </div>
+                        </div>
+                     </div>
+                     <div className="flex justify-between mt-2 text-xs font-mono">
+                        <span className="text-accent-red">{potentialLow.toFixed(2)}</span>
+                        <span className="text-accent-green">{potentialHigh.toFixed(2)}</span>
                      </div>
                 </div>
+
+                <TechnicalIndicatorsSection indicators={technicalIndicators} />
 
                 <QuantitativeSentimentSection sentiment={quantitativeSentiment} />
                 

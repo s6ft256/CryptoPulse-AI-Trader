@@ -1,13 +1,15 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { CRYPTO_PAIRS } from './constants';
-import type { CryptoPair, MarketData, Candle, AIPrediction, Order } from './types';
+import type { CryptoPair, MarketData, Candle, AIPrediction, Order, CoinScreenerPrediction } from './types';
 import { generateInitialCandles, generateNextCandle } from './services/marketDataService';
-import { getAIPrediction } from './services/geminiService';
+import { getAIPrediction, getBestCoinPrediction } from './services/geminiService';
 import { MarketList } from './components/MarketList';
 import { ChartHeader } from './components/ChartHeader';
 import { TradingChart } from './components/TradingChart';
 import { TradePanel } from './components/TradePanel';
 import { AiAnalysis } from './components/AiAnalysis';
+import { CoinScreenerModal } from './components/CoinScreenerModal';
 
 const App: React.FC = () => {
   const [selectedPair, setSelectedPair] = useState<CryptoPair>(CRYPTO_PAIRS[0]);
@@ -17,6 +19,12 @@ const App: React.FC = () => {
   const [aiPrediction, setAiPrediction] = useState<AIPrediction | null>(null);
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  const [screenerPrediction, setScreenerPrediction] = useState<CoinScreenerPrediction | null>(null);
+  const [isScreenerLoading, setIsScreenerLoading] = useState(false);
+  const [screenerError, setScreenerError] = useState<string | null>(null);
+  const [isScreenerModalOpen, setIsScreenerModalOpen] = useState(false);
+  
   
   // Initialize and update candle data
   useEffect(() => {
@@ -81,6 +89,26 @@ const App: React.FC = () => {
     setOrders(prev => [newOrder, ...prev]);
   };
 
+  const handleFindBestCoin = useCallback(async () => {
+    setIsScreenerLoading(true);
+    setScreenerError(null);
+    setScreenerPrediction(null);
+    setIsScreenerModalOpen(true);
+    try {
+      const pairSymbols = CRYPTO_PAIRS.map(p => p.symbol);
+      const prediction = await getBestCoinPrediction(pairSymbols);
+      setScreenerPrediction(prediction);
+    } catch (err: any) {
+      setScreenerError(err.message || 'An unknown error occurred.');
+    } finally {
+      setIsScreenerLoading(false);
+    }
+  }, []);
+
+  const handleCloseScreenerModal = () => {
+    setIsScreenerModalOpen(false);
+  };
+
   return (
     <div className="h-screen w-screen text-dark-text-primary font-sans text-xs flex flex-col">
       <header className="p-2 border-b border-dark-border flex-shrink-0">
@@ -88,7 +116,12 @@ const App: React.FC = () => {
       </header>
       <main className="flex-grow grid grid-cols-[250px_auto_300px] grid-rows-[auto_1fr] gap-1 p-1 overflow-hidden">
         <div className="col-start-1 col-end-2 row-start-1 row-end-3 border border-dark-border rounded-md">
-          <MarketList pairs={CRYPTO_PAIRS} selectedPair={selectedPair} onSelectPair={setSelectedPair} />
+          <MarketList
+            pairs={CRYPTO_PAIRS}
+            selectedPair={selectedPair}
+            onSelectPair={setSelectedPair}
+            onFindBestCoin={handleFindBestCoin}
+          />
         </div>
 
         <div className="col-start-2 col-end-3 row-start-1 row-end-2 border border-dark-border rounded-md">
@@ -112,6 +145,14 @@ const App: React.FC = () => {
             />
         </div>
       </main>
+      {isScreenerModalOpen && (
+        <CoinScreenerModal
+          prediction={screenerPrediction}
+          isLoading={isScreenerLoading}
+          error={screenerError}
+          onClose={handleCloseScreenerModal}
+        />
+      )}
     </div>
   );
 };

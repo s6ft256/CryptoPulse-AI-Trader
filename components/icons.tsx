@@ -80,3 +80,12 @@ export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
     </svg>
 );
+
+export const TrophyIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9a9 9 0 1 1 9 0Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12.75 11.25a.75.75 0 0 1-1.5 0V6.75a.75.75 0 0 1 1.5 0v4.5Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 8.25a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75v-1.5m0 1.5v3.75m0-3.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Zm0 0a3.75 3.75 0 1 0 7.5 0 3.75 3.75 0 0 0-7.5 0Z" />
+    </svg>
+);

@@ -5,6 +5,7 @@ const BASE_PRICES: { [key: string]: number } = {
   DOGE: 0.16, ADA: 0.45, AVAX: 37, SHIB: 0.000025,
   DOT: 7.2, LINK: 17.5, MATIC: 0.7, TRX: 0.11,
   LTC: 83, BCH: 470,
+  TON: 7.5, NEAR: 5.5, UNI: 10, ICP: 8.5, FIL: 4.5,
 };
 
 const VOLATILITY: { [key: string]: number } = {
@@ -12,6 +13,7 @@ const VOLATILITY: { [key: string]: number } = {
   DOGE: 0.05, ADA: 0.035, AVAX: 0.045, SHIB: 0.06,
   DOT: 0.03, LINK: 0.03, MATIC: 0.035, TRX: 0.025,
   LTC: 0.028, BCH: 0.032,
+  TON: 0.05, NEAR: 0.04, UNI: 0.045, ICP: 0.038, FIL: 0.042,
 };
 
 export const generateInitialCandles = (pair: CryptoPair, count = 100): Candle[] => {

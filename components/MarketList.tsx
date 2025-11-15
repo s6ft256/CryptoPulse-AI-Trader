@@ -1,13 +1,16 @@
+
 import React, { useState, useMemo } from 'react';
 import type { CryptoPair } from '../types';
+import { BrainCircuitIcon } from './icons';
 
 interface MarketListProps {
   pairs: CryptoPair[];
   selectedPair: CryptoPair;
   onSelectPair: (pair: CryptoPair) => void;
+  onFindBestCoin: () => void;
 }
 
-export const MarketList: React.FC<MarketListProps> = ({ pairs, selectedPair, onSelectPair }) => {
+export const MarketList: React.FC<MarketListProps> = ({ pairs, selectedPair, onSelectPair, onFindBestCoin }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredPairs = useMemo(() => {
@@ -16,7 +19,14 @@ export const MarketList: React.FC<MarketListProps> = ({ pairs, selectedPair, onS
 
   return (
     <div className="bg-dark-surface h-full flex flex-col">
-      <div className="p-2 border-b border-dark-border">
+      <div className="p-2 border-b border-dark-border space-y-2">
+        <button 
+          onClick={onFindBestCoin}
+          className="w-full flex items-center justify-center gap-2 p-2 rounded-md bg-accent-blue hover:bg-blue-500 text-white font-bold text-sm transition-colors"
+        >
+          <BrainCircuitIcon className="w-5 h-5" />
+          AI Coin Screener
+        </button>
         <input
           type="text"
           placeholder="Search markets..."

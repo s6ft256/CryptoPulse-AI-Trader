@@ -1,4 +1,3 @@
-
 import type { CryptoPair } from './types';
 
 export const CRYPTO_PAIRS: CryptoPair[] = [
@@ -17,6 +16,11 @@ export const CRYPTO_PAIRS: CryptoPair[] = [
   { base: 'TRX', quote: 'USDT', symbol: 'TRX/USDT' },
   { base: 'LTC', quote: 'USDT', symbol: 'LTC/USDT' },
   { base: 'BCH', quote: 'USDT', symbol: 'BCH/USDT' },
+  { base: 'TON', quote: 'USDT', symbol: 'TON/USDT' },
+  { base: 'NEAR', quote: 'USDT', symbol: 'NEAR/USDT' },
+  { base: 'UNI', quote: 'USDT', symbol: 'UNI/USDT' },
+  { base: 'ICP', quote: 'USDT', symbol: 'ICP/USDT' },
+  { base: 'FIL', quote: 'USDT', symbol: 'FIL/USDT' },
 ];
 
 // FIX: Add CURRENCIES
@@ -48,4 +52,9 @@ export const CRYPTO_ASSETS: { code: string; name: string }[] = [
   { code: 'TRX', name: 'Tron' },
   { code: 'LTC', name: 'Litecoin' },
   { code: 'BCH', name: 'Bitcoin Cash' },
+  { code: 'TON', name: 'Toncoin' },
+  { code: 'NEAR', name: 'Near Protocol' },
+  { code: 'UNI', name: 'Uniswap' },
+  { code: 'ICP', name: 'Internet Computer' },
+  { code: 'FIL', name: 'Filecoin' },
 ];
