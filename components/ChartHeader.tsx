@@ -6,7 +6,7 @@ interface ChartHeaderProps {
 }
 
 const Stat: React.FC<{ label: string; value: string | number; className?: string }> = ({ label, value, className }) => (
-  <div>
+  <div className="text-right">
     <p className="text-xs text-dark-text-secondary">{label}</p>
     <p className={`text-sm font-mono ${className || 'text-dark-text-primary'}`}>{value}</p>
   </div>
@@ -14,7 +14,6 @@ const Stat: React.FC<{ label: string; value: string | number; className?: string
 
 export const ChartHeader: React.FC<ChartHeaderProps> = ({ marketData }) => {
   const [priceFlash, setPriceFlash] = useState('');
-  // FIX: The useRef hook requires an initial value.
   const prevPriceRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
@@ -38,8 +37,16 @@ export const ChartHeader: React.FC<ChartHeaderProps> = ({ marketData }) => {
 
   if (!marketData) {
     return (
-      <div className="p-4 border-b border-dark-border animate-pulse">
+      <div className="p-3 border-b border-dark-border animate-pulse flex justify-between items-center">
         <div className="h-6 w-1/4 bg-dark-border rounded"></div>
+        <div className="flex items-center gap-x-5">
+            <div className="h-10 w-24 bg-dark-border rounded-md"></div>
+            <div className="h-8 w-px bg-dark-bg"></div>
+            <div className="h-8 w-20 bg-dark-border rounded"></div>
+            <div className="h-8 w-20 bg-dark-border rounded"></div>
+            <div className="h-8 w-20 bg-dark-border rounded"></div>
+            <div className="h-8 w-24 bg-dark-border rounded"></div>
+        </div>
       </div>
     );
   }
@@ -47,15 +54,20 @@ export const ChartHeader: React.FC<ChartHeaderProps> = ({ marketData }) => {
   const changeColor = marketData.change24h >= 0 ? 'text-accent-green' : 'text-accent-red';
 
   return (
-    <div className="p-3 border-b border-dark-border flex items-center space-x-6">
-      <h2 className="text-xl font-bold text-white">{marketData.symbol}</h2>
-      <div className={`px-2 py-1 rounded transition-colors duration-300 ${priceFlash}`}>
-        <Stat label="Last Price" value={marketData.price.toFixed(4)} className={`text-lg ${changeColor}`} />
+    <div className="p-3 border-b border-dark-border flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <h2 className="text-xl font-bold text-white">{marketData.symbol}</h2>
       </div>
-      <Stat label="24h Change" value={`${marketData.change24h.toFixed(2)}%`} className={changeColor} />
-      <Stat label="24h High" value={marketData.high24h.toFixed(4)} />
-      <Stat label="24h Low" value={marketData.low24h.toFixed(4)} />
-      <Stat label="24h Volume" value={marketData.volume24h.toLocaleString(undefined, { maximumFractionDigits: 0 })} />
+      <div className="flex items-center gap-x-5">
+        <div className={`px-2 py-1 rounded-md transition-colors duration-300 ${priceFlash}`}>
+           <p className={`text-xl text-right font-mono font-semibold ${changeColor}`}>{marketData.price.toFixed(4)}</p>
+        </div>
+        <div className="h-8 w-px bg-dark-border"></div>
+        <Stat label="24h Change" value={`${marketData.change24h.toFixed(2)}%`} className={changeColor} />
+        <Stat label="24h High" value={marketData.high24h.toFixed(4)} />
+        <Stat label="24h Low" value={marketData.low24h.toFixed(4)} />
+        <Stat label="24h Volume" value={marketData.volume24h.toLocaleString(undefined, { maximumFractionDigits: 0 })} />
+      </div>
     </div>
   );
 };

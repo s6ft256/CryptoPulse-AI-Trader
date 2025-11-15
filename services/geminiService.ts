@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from '@google/genai';
 import type { AIPrediction } from '../types';
 
@@ -12,8 +13,17 @@ const aiPredictionSchema = {
     summary: { type: Type.STRING, description: "A concise, overall summary of the monthly forecast." },
     keyDrivers: { type: Type.STRING, description: "A paragraph explaining the key factors (technical, fundamental, sentimental) driving this forecast." },
     strategy: { type: Type.STRING, description: "A suggested trading or investment strategy for the upcoming month." },
+    quantitativeSentiment: {
+        type: Type.OBJECT,
+        description: "Analysis of quantitative sentiment indicators.",
+        properties: {
+            newsScore: { type: Type.NUMBER, description: "A score from -50 to 50 based on recent news sentiment." },
+            retailPositioning: { type: Type.STRING, description: "Summary of retail trader positioning, e.g., '65% Long'." }
+        },
+        required: ['newsScore', 'retailPositioning']
+    },
   },
-  required: ['prediction', 'confidence', 'priceTarget', 'potentialHigh', 'potentialLow', 'summary', 'keyDrivers', 'strategy'],
+  required: ['prediction', 'confidence', 'priceTarget', 'potentialHigh', 'potentialLow', 'summary', 'keyDrivers', 'strategy', 'quantitativeSentiment'],
 };
 
 
@@ -31,6 +41,10 @@ export const getAIPrediction = async (pairSymbol: string, lastPrice: number): Pr
             summary: "Mock: The asset is positioned for a significant move this month, driven by prevailing market sentiment and key technical levels. Volatility is expected.",
             keyDrivers: "Mock: Key drivers include the upcoming protocol upgrade, recent whale activity showing accumulation, and the current price holding strong above the 50-day moving average.",
             strategy: "Mock: A suitable strategy would be to accumulate on dips towards the potential low, with an initial profit target near the monthly price target. Keep a close eye on regulatory news.",
+            quantitativeSentiment: {
+                newsScore: isBullish ? 25 : -15,
+                retailPositioning: isBullish ? '68% Long' : '72% Short',
+            },
         } as AIPrediction);
     }, 2000));
   }
@@ -50,6 +64,7 @@ export const getAIPrediction = async (pairSymbol: string, lastPrice: number): Pr
     5. A summary of your forecast.
     6. An explanation of the key drivers (e.g., market sentiment, technical patterns on daily/weekly charts, upcoming news or events).
     7. A suggested trading/investment strategy for the month.
+    8. Quantitative sentiment analysis, including a news sentiment score (-50 to 50) and a summary of retail trader positioning (e.g., "65% Long").
 
     Your response MUST be a single, valid, minified JSON object that adheres to the provided schema. Do not include any other text or markdown.
   `;

@@ -52,6 +52,10 @@ export interface AIPrediction {
   summary: string;
   keyDrivers: string;
   strategy: string;
+  quantitativeSentiment: {
+    newsScore: number;
+    retailPositioning: string;
+  };
 }
 
 export type OrderType = 'BUY' | 'SELL';

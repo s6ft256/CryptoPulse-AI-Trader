@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { AIPrediction } from '../types';
 import { BrainCircuitIcon, LoadingSpinner } from './icons';
@@ -15,6 +16,27 @@ const AnalysisSection: React.FC<{title: string, children: React.ReactNode}> = ({
         <div className="text-dark-text-primary text-xs leading-relaxed">{children}</div>
     </div>
 );
+
+const QuantitativeSentimentSection: React.FC<{ sentiment: AIPrediction['quantitativeSentiment'] }> = ({ sentiment }) => {
+    if (!sentiment) return null;
+    
+    const scoreColor = sentiment.newsScore > 20 ? 'text-accent-green' : sentiment.newsScore < -20 ? 'text-accent-red' : 'text-slate-300';
+    
+    return (
+        <AnalysisSection title="Quantitative Sentiment">
+            <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                <div className="bg-dark-surface p-2 rounded">
+                    <p className="text-dark-text-secondary mb-1">News Score</p>
+                    <p className={`font-mono font-bold text-lg ${scoreColor}`}>{sentiment.newsScore}</p>
+                </div>
+                 <div className="bg-dark-surface p-2 rounded">
+                    <p className="text-dark-text-secondary mb-1">Retail Position</p>
+                    <p className="font-mono font-bold text-lg text-white">{sentiment.retailPositioning}</p>
+                </div>
+            </div>
+        </AnalysisSection>
+    );
+};
 
 export const AiAnalysis: React.FC<AiAnalysisProps> = ({ prediction, isLoading, error, onGetPrediction }) => {
 
@@ -52,7 +74,7 @@ export const AiAnalysis: React.FC<AiAnalysisProps> = ({ prediction, isLoading, e
             );
         }
 
-        const { prediction: trend, confidence, priceTarget, potentialHigh, potentialLow, summary, keyDrivers, strategy } = prediction;
+        const { prediction: trend, confidence, priceTarget, potentialHigh, potentialLow, summary, keyDrivers, strategy, quantitativeSentiment } = prediction;
         
         const trendColor = 
             trend === 'BULLISH' ? 'text-accent-green' :
@@ -92,6 +114,8 @@ export const AiAnalysis: React.FC<AiAnalysisProps> = ({ prediction, isLoading, e
                      </div>
                 </div>
 
+                <QuantitativeSentimentSection sentiment={quantitativeSentiment} />
+                
                 <AnalysisSection title="Analysis Summary">
                     <p>{summary}</p>
                 </AnalysisSection>

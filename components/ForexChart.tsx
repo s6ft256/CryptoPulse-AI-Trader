@@ -55,8 +55,8 @@ const CustomTooltip: React.FC<{ active?: boolean, payload?: any[], label?: strin
         const closeColor = isDoji ? neutralPatternColor : (data.open && data.price >= data.open ? upColor : downColor);
 
         return (
-            <div className="p-3 bg-brand-bg-light border border-brand-border rounded-lg shadow-xl text-sm w-48 space-y-2">
-                <p className="label text-slate-200 font-bold mb-2">{`${label}`}</p>
+            <div className="p-3 bg-dark-surface border border-dark-border rounded-lg shadow-xl text-sm w-48 space-y-2">
+                <p className="label text-dark-text-primary font-bold mb-2">{`${label}`}</p>
                 
                 {/* Price Info */}
                 <div className="space-y-1">
@@ -68,7 +68,7 @@ const CustomTooltip: React.FC<{ active?: boolean, payload?: any[], label?: strin
 
                 {/* Indicators */}
                 {(data.ema12 !== undefined || data.rsi !== undefined || data.macd !== undefined) && (
-                     <div className="pt-2 border-t border-brand-border/50 space-y-1">
+                     <div className="pt-2 border-t border-dark-border/50 space-y-1">
                         {data.ema12 !== undefined && <IndicatorRow label="EMA(12)" value={data.ema12.toFixed(indicatorFixedPoints)} color={ema12Color} />}
                         {data.ema26 !== undefined && <IndicatorRow label="EMA(26)" value={data.ema26.toFixed(indicatorFixedPoints)} color={ema26Color} />}
                         {data.bollingerUpper !== undefined && <IndicatorRow label="BB Upper" value={data.bollingerUpper.toFixed(indicatorFixedPoints)} color={bollingerBandColor} />}
@@ -80,7 +80,7 @@ const CustomTooltip: React.FC<{ active?: boolean, payload?: any[], label?: strin
                     </div>
                 )}
                  {data.pattern && (
-                    <div className="pt-2 mt-2 border-t border-brand-border/50 text-center">
+                    <div className="pt-2 mt-2 border-t border-dark-border/50 text-center">
                         <p className="font-bold text-sm" style={{ color: getPatternColor(data.pattern.type) }}>{data.pattern.name}</p>
                     </div>
                 )}
@@ -247,15 +247,15 @@ export const ForexChart: React.FC<ForexChartProps> = ({ data, trend, lineName, i
                 {!isFuture && showIndicatorControls && hasIndicatorData && (
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-400">Indicators:</span>
-                        <button onClick={() => setShowMACD(!showMACD)} className={`text-xs px-2 py-1 rounded transition-colors ${showMACD ? 'bg-indigo-600 text-white' : 'bg-brand-bg-dark hover:bg-slate-700 text-slate-300'}`}>MACD</button>
-                        <button onClick={() => setShowRSI(!showRSI)} className={`text-xs px-2 py-1 rounded transition-colors ${showRSI ? 'bg-indigo-600 text-white' : 'bg-brand-bg-dark hover:bg-slate-700 text-slate-300'}`}>RSI</button>
+                        <button onClick={() => setShowMACD(!showMACD)} className={`text-xs px-2 py-1 rounded transition-colors ${showMACD ? 'bg-indigo-600 text-white' : 'bg-dark-surface hover:bg-dark-border text-slate-300'}`}>MACD</button>
+                        <button onClick={() => setShowRSI(!showRSI)} className={`text-xs px-2 py-1 rounded transition-colors ${showRSI ? 'bg-indigo-600 text-white' : 'bg-dark-surface hover:bg-dark-border text-slate-300'}`}>RSI</button>
                     </div>
                 )}
                 <div className="flex items-center gap-2">
-                    <button onClick={() => setIsDrawingMode(!isDrawingMode)} className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${isDrawingMode ? 'bg-indigo-600 text-white' : 'bg-brand-bg-dark hover:bg-slate-700 text-slate-300'}`}>
+                    <button onClick={() => setIsDrawingMode(!isDrawingMode)} className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${isDrawingMode ? 'bg-indigo-600 text-white' : 'bg-dark-surface hover:bg-dark-border text-slate-300'}`}>
                         <PencilIcon className="w-3 h-3"/> Draw
                     </button>
-                    <button onClick={() => setLines([])} disabled={lines.length === 0} className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors bg-brand-bg-dark hover:bg-slate-700 text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button onClick={() => setLines([])} disabled={lines.length === 0} className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors bg-dark-surface hover:bg-dark-border text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed">
                         <TrashIcon className="w-3 h-3"/> Clear
                     </button>
                 </div>
@@ -288,19 +288,19 @@ export const ForexChart: React.FC<ForexChartProps> = ({ data, trend, lineName, i
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <CartesianGrid strokeDasharray="2 2" stroke="#334155" />
-          <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tick={hasIndicatorData && visibleIndicators > 0 ? { display: 'none' } : {}}/>
-          <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} domain={[domainMin, domainMax]} tickFormatter={(value) => isCrypto ? `$${Math.round(value)}` : `${value.toFixed(4)}`} />
-          <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#94a3b8', strokeWidth: 1, strokeDasharray: '3 3' }}/>
+          <CartesianGrid strokeDasharray="2 2" stroke="#2a2e39" />
+          <XAxis dataKey="date" stroke="#8b92a1" fontSize={12} tickLine={false} axisLine={false} tick={hasIndicatorData && visibleIndicators > 0 ? { display: 'none' } : {}}/>
+          <YAxis stroke="#8b92a1" fontSize={12} tickLine={false} axisLine={false} domain={[domainMin, domainMax]} tickFormatter={(value) => isCrypto ? `$${Math.round(value)}` : `${value.toFixed(4)}`} />
+          <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#8b92a1', strokeWidth: 1, strokeDasharray: '3 3' }}/>
           
           {takeProfitPrice && !isFuture && (
             <ReferenceLine y={takeProfitPrice} stroke={upColor} strokeDasharray="4 4" strokeWidth={2}>
-              <Label value={`TP: ${takeProfitPrice.toFixed(isCrypto ? 2 : 4)}`} position="right" fill={upColor} fontSize={12} style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', padding: '2px 4px', borderRadius: '3px' }} />
+              <Label value={`TP: ${takeProfitPrice.toFixed(isCrypto ? 2 : 4)}`} position="right" fill={upColor} fontSize={12} style={{ backgroundColor: 'rgba(19, 23, 34, 0.7)', padding: '2px 4px', borderRadius: '3px' }} />
             </ReferenceLine>
           )}
           {stopLossPrice && !isFuture && (
             <ReferenceLine y={stopLossPrice} stroke={downColor} strokeDasharray="4 4" strokeWidth={2}>
-              <Label value={`SL: ${stopLossPrice.toFixed(isCrypto ? 2 : 4)}`} position="right" fill={downColor} fontSize={12} style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', padding: '2px 4px', borderRadius: '3px' }}/>
+              <Label value={`SL: ${stopLossPrice.toFixed(isCrypto ? 2 : 4)}`} position="right" fill={downColor} fontSize={12} style={{ backgroundColor: 'rgba(19, 23, 34, 0.7)', padding: '2px 4px', borderRadius: '3px' }}/>
             </ReferenceLine>
           )}
 
@@ -334,10 +334,10 @@ export const ForexChart: React.FC<ForexChartProps> = ({ data, trend, lineName, i
       {hasIndicatorData && showRSI && (
          <ResponsiveContainer width="100%" height={indicatorChartHeight}>
             <LineChart data={data} syncId="forexSync" margin={{ top: 10, right: 5, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                 <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tick={showMACD ? { display: 'none' } : {}}/>
-                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} ticks={[10, 30, 50, 70, 90]} />
-                <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#94a3b8', strokeWidth: 1, strokeDasharray: '3 3' }}/>
+                <CartesianGrid strokeDasharray="3 3" stroke="#2a2e39" />
+                 <XAxis dataKey="date" stroke="#8b92a1" fontSize={12} tickLine={false} axisLine={false} tick={showMACD ? { display: 'none' } : {}}/>
+                <YAxis stroke="#8b92a1" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} ticks={[10, 30, 50, 70, 90]} />
+                <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#8b92a1', strokeWidth: 1, strokeDasharray: '3 3' }}/>
                 <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="3 3" />
                 <ReferenceLine y={30} stroke="#10b981" strokeDasharray="3 3" />
                 <Line type="monotone" dataKey="rsi" stroke="#c084fc" strokeWidth={1} dot={false} />
@@ -348,11 +348,11 @@ export const ForexChart: React.FC<ForexChartProps> = ({ data, trend, lineName, i
       {hasIndicatorData && showMACD && (
          <ResponsiveContainer width="100%" height={indicatorChartHeight}>
             <ComposedChart data={data} syncId="forexSync" margin={{ top: 10, right: 5, left: 0, bottom: 5, }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => value.toFixed(isCrypto ? 0 : 4)} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#94a3b8', strokeWidth: 1, strokeDasharray: '3 3' }}/>
-                <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="2 2" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2a2e39" />
+                <XAxis dataKey="date" stroke="#8b92a1" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#8b92a1" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => value.toFixed(isCrypto ? 0 : 4)} allowDecimals={false} />
+                <Tooltip content={<CustomTooltip isCrypto={isCrypto} />} cursor={{ stroke: '#8b92a1', strokeWidth: 1, strokeDasharray: '3 3' }}/>
+                <ReferenceLine y={0} stroke="#8b92a1" strokeDasharray="2 2" />
                 <Bar dataKey="macdHist" barSize={5}>
                     {data.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.macdHist && entry.macdHist >= 0 ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'} />

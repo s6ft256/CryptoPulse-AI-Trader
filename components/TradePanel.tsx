@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { OrderType, CryptoPair, MarketData, OrderMode, Order } from '../types';
 
 interface TradePanelProps {
@@ -7,38 +7,51 @@ interface TradePanelProps {
   onPlaceOrder: (orderParams: Omit<Order, 'id' | 'symbol' | 'date'>) => void;
 }
 
+const InputField: React.FC<{
+    label: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder: string;
+    unit: string;
+    type?: string;
+    disabled?: boolean;
+}> = ({ label, value, onChange, placeholder, unit, type = "number", disabled = false }) => (
+    <div>
+        <label className="block text-xs font-medium text-dark-text-secondary mb-1.5">{label}</label>
+        <div className="relative">
+            <input 
+                type={type} 
+                step="any"
+                value={value} 
+                onChange={onChange} 
+                placeholder={placeholder}
+                disabled={disabled}
+                className="w-full bg-dark-bg p-2.5 rounded-md border border-dark-border text-dark-text-primary focus:outline-none focus:ring-1 focus:ring-accent-blue transition-colors disabled:bg-dark-border disabled:text-dark-text-secondary pr-14" 
+            />
+            <span className="absolute inset-y-0 right-4 flex items-center text-dark-text-secondary text-xs font-mono pointer-events-none">{unit}</span>
+        </div>
+    </div>
+);
+
+
 export const TradePanel: React.FC<TradePanelProps> = ({ selectedPair, marketData, onPlaceOrder }) => {
   const [activeTab, setActiveTab] = useState<OrderType>('BUY');
   const [orderMode, setOrderMode] = useState<OrderMode>('Limit');
   const [price, setPrice] = useState('');
   const [stopPrice, setStopPrice] = useState('');
   const [amount, setAmount] = useState('');
-  const [priceFlash, setPriceFlash] = useState('');
-  const prevPriceRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (marketData?.price) {
-      setPrice(marketData.price.toFixed(4));
+      if (document.activeElement?.tagName.toLowerCase() !== 'input') {
+        setPrice(marketData.price.toFixed(4));
+      }
       setStopPrice(marketData.price.toFixed(4));
     } else {
       setPrice('');
       setStopPrice('');
     }
   }, [marketData?.symbol]);
-
-  useEffect(() => {
-    if (marketData && prevPriceRef.current !== undefined && marketData.price !== prevPriceRef.current) {
-      setPriceFlash(marketData.price > prevPriceRef.current ? 'bg-accent-green/20' : 'bg-accent-red/20');
-      const timer = setTimeout(() => setPriceFlash(''), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [marketData?.price]);
-
-  useEffect(() => {
-    if (marketData) {
-      prevPriceRef.current = marketData.price;
-    }
-  }, [marketData?.price]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +84,7 @@ export const TradePanel: React.FC<TradePanelProps> = ({ selectedPair, marketData
     
     if (orderParams) {
       onPlaceOrder(orderParams);
+      setAmount('');
     }
   };
   
@@ -83,80 +97,62 @@ export const TradePanel: React.FC<TradePanelProps> = ({ selectedPair, marketData
     return '0.00';
   }, [price, amount, orderMode, marketData]);
 
-  const marketPriceDisplay = marketData ? marketData.price.toFixed(4) : '---';
-  const changeColor = marketData ? (marketData.change24h >= 0 ? 'text-accent-green' : 'text-accent-red') : 'text-dark-text-primary';
-
   return (
-    <div className="bg-dark-surface h-full p-3 flex flex-col">
-      <div className="flex border-b border-dark-border">
+    <div className="bg-dark-surface h-full p-3 flex flex-col text-sm">
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-md bg-dark-bg">
         <button
           onClick={() => setActiveTab('BUY')}
-          className={`flex-1 p-2 text-sm font-bold ${activeTab === 'BUY' ? 'text-accent-green border-b-2 border-accent-green' : 'text-dark-text-secondary'}`}
+          className={`w-full text-center font-semibold rounded py-2 transition-colors duration-200 ${activeTab === 'BUY' ? 'bg-accent-green text-white' : 'text-dark-text-secondary hover:bg-dark-border'}`}
         >
           BUY
         </button>
         <button
           onClick={() => setActiveTab('SELL')}
-          className={`flex-1 p-2 text-sm font-bold ${activeTab === 'SELL' ? 'text-accent-red border-b-2 border-accent-red' : 'text-dark-text-secondary'}`}
+          className={`w-full text-center font-semibold rounded py-2 transition-colors duration-200 ${activeTab === 'SELL' ? 'bg-accent-red text-white' : 'text-dark-text-secondary hover:bg-dark-border'}`}
         >
           SELL
         </button>
       </div>
-      <div className={`flex justify-between items-center my-2 p-2 rounded transition-colors duration-300 ${priceFlash}`}>
-        <span className="text-sm text-dark-text-secondary">Market Price</span>
-        <span className={`text-lg font-mono font-bold ${changeColor}`}>{marketPriceDisplay}</span>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="flex rounded-md bg-dark-bg p-1 text-xs">
+
+      <form onSubmit={handleSubmit} className="flex flex-col flex-grow mt-3">
+        <div className="flex justify-around items-center text-xs mb-3">
           {(['Limit', 'Market', 'Stop-Limit'] as OrderMode[]).map((mode) => (
               <button
                   type="button"
                   key={mode}
                   onClick={() => setOrderMode(mode)}
-                  className={`flex-1 p-1 rounded transition-colors ${orderMode === mode ? 'bg-dark-border text-white font-semibold' : 'text-dark-text-secondary hover:bg-dark-surface'}`}
+                  className={`px-3 py-1 rounded transition-colors ${orderMode === mode ? 'text-white font-semibold' : 'text-dark-text-secondary hover:text-white'}`}
               >
                   {mode}
               </button>
           ))}
         </div>
 
-        {orderMode === 'Market' && (
-          <div>
-            <label className="text-xs text-dark-text-secondary block mb-1">Price ({selectedPair.quote})</label>
-            <input type="text" disabled value="Market" className="w-full bg-dark-bg p-2 rounded-md border border-dark-border text-dark-text-secondary focus:outline-none" />
-          </div>
-        )}
-        {orderMode === 'Limit' && (
-          <div>
-            <label className="text-xs text-dark-text-secondary block mb-1">Price ({selectedPair.quote})</label>
-            <input type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" className="w-full bg-dark-bg p-2 rounded-md border border-dark-border text-dark-text-primary focus:outline-none focus:ring-1 focus:ring-accent-blue" />
-          </div>
-        )}
-        {orderMode === 'Stop-Limit' && (
-          <>
-            <div>
-              <label className="text-xs text-dark-text-secondary block mb-1">Stop Price ({selectedPair.quote})</label>
-              <input type="number" step="0.01" value={stopPrice} onChange={e => setStopPrice(e.target.value)} placeholder="0.00" className="w-full bg-dark-bg p-2 rounded-md border border-dark-border text-dark-text-primary focus:outline-none focus:ring-1 focus:ring-accent-blue" />
-            </div>
-            <div>
-              <label className="text-xs text-dark-text-secondary block mb-1">Limit Price ({selectedPair.quote})</label>
-              <input type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" className="w-full bg-dark-bg p-2 rounded-md border border-dark-border text-dark-text-primary focus:outline-none focus:ring-1 focus:ring-accent-blue" />
-            </div>
-          </>
-        )}
-        
-        <div>
-          <label className="text-xs text-dark-text-secondary block mb-1">Amount ({selectedPair.base})</label>
-          <input type="number" step="0.0001" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-dark-bg p-2 rounded-md border border-dark-border text-dark-text-primary focus:outline-none focus:ring-1 focus:ring-accent-blue" />
-        </div>
+        <div className="space-y-3">
+          {orderMode === 'Stop-Limit' && (
+            <InputField label="Stop Price" value={stopPrice} onChange={e => setStopPrice(e.target.value)} placeholder="0.00" unit={selectedPair.quote} />
+          )}
 
-        <div>
-          <p className="text-xs text-dark-text-secondary">Total: <span className="font-mono text-dark-text-primary">{total} {selectedPair.quote}</span></p>
+          {orderMode !== 'Market' ? (
+            <InputField label={orderMode === 'Limit' ? 'Price' : 'Limit Price'} value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" unit={selectedPair.quote} />
+          ) : (
+            <InputField label="Price" value="Market" onChange={() => {}} placeholder="Market" unit={selectedPair.quote} disabled={true} type="text" />
+          )}
+          
+          <InputField label="Amount" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" unit={selectedPair.base} />
+        </div>
+        
+        <div className="flex-grow" />
+
+        <div className="flex justify-between items-center text-sm pt-3 border-t border-dark-border mt-3">
+          <span className="text-dark-text-secondary">Total</span>
+          <span className="font-mono text-white">{total} {selectedPair.quote}</span>
         </div>
 
         <button
           type="submit"
-          className={`w-full p-2 rounded-md font-bold text-white ${activeTab === 'BUY' ? 'bg-accent-green hover:bg-green-600' : 'bg-accent-red hover:bg-red-600'}`}
+          disabled={!parseFloat(amount) || parseFloat(amount) <= 0}
+          className={`w-full p-3 mt-3 rounded-md font-bold text-white transition-colors duration-200 disabled:bg-dark-border disabled:text-dark-text-secondary disabled:cursor-not-allowed ${activeTab === 'BUY' ? 'bg-accent-green hover:bg-green-700' : 'bg-accent-red hover:bg-red-700'}`}
         >
           {activeTab === 'BUY' ? `Buy ${selectedPair.base}` : `Sell ${selectedPair.base}`}
         </button>
