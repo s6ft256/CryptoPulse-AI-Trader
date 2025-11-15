@@ -127,11 +127,15 @@ export interface TopCoinPick {
   reasoning: string;
   confidence: number;
   potentialGain: string;
+  site: string;
+  when: string;
 }
 
 export interface ContenderCoin {
   symbol: string;
   summary: string;
+  price?: number;
+  change24h?: number;
 }
 
 export interface CoinScreenerPrediction {

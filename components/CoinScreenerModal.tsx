@@ -20,6 +20,13 @@ const Section: React.FC<{ title: string; children: React.ReactNode; icon?: React
   </div>
 );
 
+const formatPrice = (price: number): string => {
+    if (price >= 1000) return price.toFixed(2);
+    if (price >= 1) return price.toFixed(4);
+    if (price >= 0.0001) return price.toFixed(6);
+    return price.toPrecision(2);
+};
+
 
 export const CoinScreenerModal: React.FC<CoinScreenerModalProps> = ({ prediction, isLoading, error, onClose }) => {
 
@@ -68,17 +75,40 @@ export const CoinScreenerModal: React.FC<CoinScreenerModalProps> = ({ prediction
                             <p className="text-2xl font-mono font-bold text-accent-green">{topPick.potentialGain}</p>
                         </div>
                     </div>
-                    <p className="mt-3 text-dark-text-primary text-sm leading-relaxed border-t border-dark-border pt-3">{topPick.reasoning}</p>
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="bg-dark-surface p-3 rounded-md border border-dark-border">
+                            <p className="text-dark-text-secondary mb-1">Recommended Exchange</p>
+                            <p className="font-semibold text-white">{topPick.site}</p>
+                        </div>
+                        <div className="bg-dark-surface p-3 rounded-md border border-dark-border">
+                            <p className="text-dark-text-secondary mb-1">Suggested Buy Condition</p>
+                            <p className="font-semibold text-white">{topPick.when}</p>
+                        </div>
+                    </div>
+                    <p className="mt-4 text-dark-text-primary text-sm leading-relaxed border-t border-dark-border pt-4">{topPick.reasoning}</p>
                 </div>
 
                 <Section title="Top Contenders" icon={<BrainCircuitIcon className="w-5 h-5 text-indigo-400" />}>
                    <ul className="space-y-3">
-                        {contenders.map((contender, index) => (
-                             <li key={index} className="p-3 bg-dark-surface rounded-md border border-dark-border">
-                                <p className="font-bold text-white">{index + 1}. {contender.symbol}</p>
-                                <p className="text-xs text-dark-text-secondary mt-1">{contender.summary}</p>
-                            </li>
-                        ))}
+                        {contenders.map((contender, index) => {
+                             const changeColor = contender.change24h && contender.change24h >= 0 ? 'text-accent-green' : 'text-accent-red';
+                             return (
+                                <li key={index} className="p-3 bg-dark-surface rounded-md border border-dark-border">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-bold text-white">{index + 1}. {contender.symbol}</p>
+                                            <p className="text-xs text-dark-text-secondary mt-1 max-w-md">{contender.summary}</p>
+                                        </div>
+                                        {contender.price !== undefined && contender.change24h !== undefined && (
+                                            <div className="text-right flex-shrink-0 ml-4">
+                                                <p className="font-mono font-semibold text-white">{formatPrice(contender.price)}</p>
+                                                <p className={`font-mono font-semibold text-xs ${changeColor}`}>{contender.change24h.toFixed(2)}%</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </li>
+                            )
+                        })}
                    </ul>
                 </Section>
 

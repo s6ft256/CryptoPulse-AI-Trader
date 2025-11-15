@@ -115,9 +115,11 @@ const coinScreenerSchema = {
                 symbol: { type: Type.STRING },
                 reasoning: { type: Type.STRING, description: "Detailed reasoning for why this is the top pick for the month." },
                 confidence: { type: Type.NUMBER, description: "Confidence score (0-100) for this pick." },
-                potentialGain: { type: Type.STRING, description: "Estimated potential percentage gain, e.g., '15-25%'." }
+                potentialGain: { type: Type.STRING, description: "Estimated potential percentage gain, e.g., '15-25%'." },
+                site: { type: Type.STRING, description: "The primary exchange or platform recommended for trading this coin." },
+                when: { type: Type.STRING, description: "A suggested buying condition or timeframe, e.g., 'On a dip towards $150' or 'After the next major announcement'." }
             },
-            required: ['symbol', 'reasoning', 'confidence', 'potentialGain']
+            required: ['symbol', 'reasoning', 'confidence', 'potentialGain', 'site', 'when']
         },
         contenders: {
             type: Type.ARRAY,
@@ -144,7 +146,9 @@ export const getBestCoinPrediction = async (pairSymbols: string[]): Promise<Coin
                     symbol: "SOL/USDT",
                     reasoning: "Mock: Solana is showing exceptional strength, with high developer activity and growing network usage. Key technical indicators on the daily chart are bullish, and recent news flow has been overwhelmingly positive, suggesting strong upward momentum.",
                     confidence: 88,
-                    potentialGain: "30-40%"
+                    potentialGain: "30-40%",
+                    site: "Binance / Coinbase",
+                    when: "Mock: Consider entering on a pullback towards the $150-$155 support zone."
                 },
                 contenders: [
                     { symbol: "BTC/USDT", summary: "Mock: As the market leader, Bitcoin provides a stable foundation and is showing signs of accumulation by large holders." },
@@ -164,7 +168,7 @@ export const getBestCoinPrediction = async (pairSymbols: string[]): Promise<Coin
         Your analysis must consider technical indicators (like RSI, MACD on daily/weekly charts), fundamental factors (like upcoming upgrades, ecosystem growth, tokenomics), and current market sentiment.
 
         Provide a structured response that includes:
-        1.  Your single "topPick" for the month. Include detailed "reasoning" for your choice, a "confidence" score (0-100), and an estimated "potentialGain" as a percentage range.
+        1.  Your single "topPick" for the month. Include detailed "reasoning", a "confidence" score (0-100), an estimated "potentialGain" percentage range, the best "site" (exchange) to trade it, and a suggested "when" to buy (e.g., a price level, after an event).
         2.  A list of exactly two other "contenders" with a brief "summary" for each.
         3.  A general "marketOverview" of the crypto landscape for the upcoming month.
 

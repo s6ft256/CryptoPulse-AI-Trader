@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { CRYPTO_PAIRS } from './constants';
 import type { CryptoPair, MarketData, Candle, AIPrediction, Order, CoinScreenerPrediction } from './types';
-import { generateInitialCandles, generateNextCandle } from './services/marketDataService';
+import { generateInitialCandles, generateNextCandle, getMarketDataSnapshot } from './services/marketDataService';
 import { getAIPrediction, getBestCoinPrediction } from './services/geminiService';
 import { MarketList } from './components/MarketList';
 import { ChartHeader } from './components/ChartHeader';
@@ -97,7 +97,24 @@ const App: React.FC = () => {
     try {
       const pairSymbols = CRYPTO_PAIRS.map(p => p.symbol);
       const prediction = await getBestCoinPrediction(pairSymbols);
-      setScreenerPrediction(prediction);
+      
+      // Augment the contenders with live market data
+      const contendersWithData = prediction.contenders.map(contender => {
+        const pairInfo = CRYPTO_PAIRS.find(p => p.symbol === contender.symbol);
+        if (pairInfo) {
+          const marketData = getMarketDataSnapshot(pairInfo);
+          return {
+            ...contender,
+            price: marketData.price,
+            change24h: marketData.change24h,
+          };
+        }
+        return contender;
+      });
+
+      const augmentedPrediction = { ...prediction, contenders: contendersWithData };
+      setScreenerPrediction(augmentedPrediction);
+
     } catch (err: any) {
       setScreenerError(err.message || 'An unknown error occurred.');
     } finally {
