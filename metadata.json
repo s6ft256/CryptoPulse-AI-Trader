@@ -1,0 +1,5 @@
+{
+  "name": "CryptoPulse AI Trader",
+  "description": "An advanced cryptocurrency trading dashboard that leverages the Gemini API to provide deep market analysis, AI-powered predictions, and trade suggestions. It features a professional, real-time interface inspired by leading crypto exchanges.",
+  "requestFramePermissions": []
+}
